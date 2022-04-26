@@ -23,7 +23,7 @@
     "octopus"
   ],
   "author": "SpongeData <info@spongedata.cz> (https://spongedata.cz/)",
-  "license": "GPL-3.0-or-later",
+  "license": "LGPL 2.1",
   "dependencies": {
     "js-yaml": "^4.1.0",
     "underscore": "^1.13.1"
