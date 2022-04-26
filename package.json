@@ -1,6 +1,6 @@
 {
   "name": "octo-compose",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Docker-compose on steroids with git, templating and docker-compose merging included.",
   "main": "index.js",
   "directories": {
