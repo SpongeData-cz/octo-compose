@@ -1,0 +1,31 @@
+{
+  "name": "octo-compose",
+  "version": "1.0.0",
+  "description": "Docker-compose on steroids with git, templating and docker-compose merging included.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "octo-compose": "./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@10.0.0.105:10022/octopus/octo-compose.git"
+  },
+  "keywords": [
+    "docker",
+    "swarm",
+    "compose",
+    "octopus"
+  ],
+  "author": "SpongeData <info@spongedata.cz> (https://spongedata.cz/)",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "underscore": "^1.13.1"
+  }
+}
