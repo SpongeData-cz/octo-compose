@@ -12,7 +12,8 @@
 
 # Installation
 ```sh
-npm install octo-compose
+git clone https://10.0.0.105:10443/octopus/octo-compose
+npm i octo-compose/ -g
 ```
 
 # File description
@@ -77,7 +78,7 @@ All keys except for `octo-compose` and `octo-deploy` (and their child-keys) are 
 # Host initialization and preparation
 In certain situation users need to prepare host machine to a specific state e.g. create specific volume directories, set specific user to certain files etc. For these cases you can specify initialization steps within 'octo-host-prepare' list. Each value is expected to be a valid *bash* script, order of execution is from top to bottom and in synchronous manner. Host preparation is done by this command:
 ```
-$ octo-compose -i my-cluster-compose.yml -hostPrepare # or simply -p
+$ octo-compose -i my-cluster-compose.yml --hostPrepare
 ```
 
 # Usage
