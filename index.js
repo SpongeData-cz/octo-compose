@@ -247,11 +247,74 @@ function runScript(code, envExtenstion) {
   }
 }
 
-function main(conf) {
-  const clusterComposePath = conf["-i"] || conf["--input"] || DEFAULT_IN;
-  const destComposePath = conf["-o"] || conf["--output"] || 1; /** TRICK: 1 = stdout */
-  noSwarmP = conf["-n"] || conf["--noSwarm"] || false;
-  prepareHostP = conf["-p"] || conf["--hostPrepare"]
+function parseCommandLineInputsUsingCustom() {
+  const expected_arguments = {
+    input: {type: 'string', required: false},
+    output: {type: 'string', required: false},
+    noSwarm: {type: 'boolean', required: false, default: true},
+    hostPrepare: {type: 'boolean', required: false, default: true},
+    help: {type: 'void', required: false},
+  }
+
+  let arguments = {}
+
+  const process_argv = process.argv
+
+  for (let i = 0; i < process_argv.length;) {
+    let key = process_argv[i]
+
+    if (!key.startsWith('--')) {
+      i += 1
+      continue
+    }
+
+    key = key.substring(2)
+
+    let argument = expected_arguments[key]
+
+    if (!argument) {
+      i += 1
+      continue
+    }
+
+    if (argument.type === 'string') {
+      arguments[key] = process_argv[i + 1]
+      i += 2
+    } else {
+      arguments[key] = true
+
+      i += 1
+    }
+  }
+
+  Object.keys(expected_arguments).forEach(key => {
+    if (!(key in arguments) && 'default' in expected_arguments[key]) {
+      arguments[key] = expected_arguments[key].default
+    }
+  })
+
+  return arguments
+}
+
+function main() {
+  const options = parseCommandLineInputsUsingCustom()
+
+  if ('help' in options) {
+    console.log(
+      "Usage: octo-compose [-p|--hostPrepare] [-i|--input] [-o|--output] [--noSwarm|-n] [--help|-h]\n\n"
+      + `  --input    Path to the input cluster-compose.yml file. Defaults to "${DEFAULT_IN}".\n`
+      + "  --output   Path to the output docker-compose.yml file. Defaults to stdout.\n"
+      + "  --noSwarm  Use true to disable swarm. Defaults to false.\n"
+      + "  --hostPrepare Use true value to start host initialization scripts defined under 'octo-host-prepare' key in cluster-compose.yml. May be set to true only. Stdout is used as inherited scripts stdout then. When used -o argument, stdout of scripts will be its content."
+      + "  --help     Print this message and exit.\n");
+
+    process.exit()
+  }
+
+  const clusterComposePath = options.input || DEFAULT_IN;
+  const destComposePath = options.output || 1; /** TRICK: 1 = stdout */
+  noSwarmP = options.noSwarm;
+  prepareHostP = options.hostPrepare
   const clusterJSON = expandClusterCompose(clusterComposePath);
 
   if (noSwarmP) {
@@ -277,25 +340,4 @@ function main(conf) {
   }
 }
 
-let conf = {};
-let args = process.argv.slice(2);
-for (let a = 0; a < args.length; a++) {
-  if ((a % 2) == 0) {
-    conf[args[a]] = args[a + 1];
-  }
-}
-
-// console.error("ARGS::::", conf);
-
-if (conf.hasOwnProperty("--help") || conf.hasOwnProperty("-h")) {
-  console.log(
-    "Usage: octo-compose [-p|--hostPrepare] [-i|--input] [-o|--output] [--noSwarm|-n] [--help|-h]\n\n"
-    + `  --input    Path to the input cluster-compose.yml file. Defaults to "${DEFAULT_IN}".\n`
-    + "  --output   Path to the output docker-compose.yml file. Defaults to stdout.\n"
-    + "  --noSwarm  Use true to disable swarm. Defaults to false.\n"
-    + "  --hostPrepare Use true value to start host initialization scripts defined under 'octo-host-prepare' key in cluster-compose.yml. May be set to true only. Stdout is used as inherited scripts stdout then. When used -o argument, stdout of scripts will be its content."
-    + "  --help     Print this message and exit.\n");
-  process.exit();
-}
-
-main(conf);
+main();
