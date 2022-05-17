@@ -5,6 +5,7 @@ const path = require("path");
 const yml = require("js-yaml");
 const _ = require("underscore");
 const { spawnSync, execSync } = require('child_process');
+const yargs = require('yargs');
 
 const DEFAULT_IN = 'cluster-compose.yml';
 
@@ -296,20 +297,45 @@ function parseCommandLineInputsUsingCustom() {
   return arguments
 }
 
-function main() {
-  const options = parseCommandLineInputsUsingCustom()
-
-  if ('help' in options) {
-    console.log(
-      "Usage: octo-compose [-p|--hostPrepare] [-i|--input] [-o|--output] [--noSwarm|-n] [--help|-h]\n\n"
-      + `  --input    Path to the input cluster-compose.yml file. Defaults to "${DEFAULT_IN}".\n`
-      + "  --output   Path to the output docker-compose.yml file. Defaults to stdout.\n"
-      + "  --noSwarm  Use true to disable swarm. Defaults to false.\n"
-      + "  --hostPrepare Use true value to start host initialization scripts defined under 'octo-host-prepare' key in cluster-compose.yml. May be set to true only. Stdout is used as inherited scripts stdout then. When used -o argument, stdout of scripts will be its content."
-      + "  --help     Print this message and exit.\n");
-
-    process.exit()
+function parseCommandLineInputsUsingYargs() {
+  const DEFAULTS = {
+    input: 'cluster-compose.yml',
+    noSwarm: false,
+    hostPrepare: false
   }
+
+  const options = yargs
+    .option('i', {
+      alias: 'input',
+      describe: `Path to the input cluster-compose.yml file. Defaults to "${DEFAULTS.input}".`,
+      default: DEFAULTS.input,
+      type: 'string'
+    })
+    .option('o', {
+      alias: 'output',
+      describe: 'Path to the output docker-compose.yml file. Defaults to stdout',
+      type: 'string'
+    })
+    .option('ns', {
+      alias: 'no-swarm',
+      describe: 'Use true to disable swarm. Defaults to false',
+      default: false,
+      type: 'boolean'
+    })
+    .option('hp', {
+      alias: 'host-prepare',
+      describe: 'Use true value to start host initialization scripts defined under \'octo-host-prepare\' key in cluster-compose.yml. May be set to true only. Stdout is used as inherited scripts stdout then. When used -o argument, stdout of scripts will be its content.',
+      default: false,
+      type: 'boolean'
+    })
+    .help()
+    .argv
+
+  return options
+}
+
+function main() {
+  const options = parseCommandLineInputsUsingYargs()
 
   const clusterComposePath = options.input || DEFAULT_IN;
   const destComposePath = options.output || 1; /** TRICK: 1 = stdout */

@@ -26,6 +26,7 @@
   "license": "LGPL 2.1",
   "dependencies": {
     "js-yaml": "^4.1.0",
-    "underscore": "^1.13.1"
+    "underscore": "^1.13.1",
+    "yargs": "^17.5.1"
   }
 }
