@@ -13,7 +13,7 @@
 # Installation
 ```sh
 git clone https://10.0.0.105:10443/octopus/octo-compose
-npm i octo-compose/ -g
+npm i octo-compose -g
 ```
 
 # File description
