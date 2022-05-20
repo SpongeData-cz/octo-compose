@@ -248,56 +248,7 @@ function runScript(code, envExtenstion) {
   }
 }
 
-function parseCommandLineInputsUsingCustom() {
-  const expected_arguments = {
-    input: {type: 'string', required: false},
-    output: {type: 'string', required: false},
-    noSwarm: {type: 'boolean', required: false, default: true},
-    hostPrepare: {type: 'boolean', required: false, default: true},
-    help: {type: 'void', required: false},
-  }
-
-  let arguments = {}
-
-  const process_argv = process.argv
-
-  for (let i = 0; i < process_argv.length;) {
-    let key = process_argv[i]
-
-    if (!key.startsWith('--')) {
-      i += 1
-      continue
-    }
-
-    key = key.substring(2)
-
-    let argument = expected_arguments[key]
-
-    if (!argument) {
-      i += 1
-      continue
-    }
-
-    if (argument.type === 'string') {
-      arguments[key] = process_argv[i + 1]
-      i += 2
-    } else {
-      arguments[key] = true
-
-      i += 1
-    }
-  }
-
-  Object.keys(expected_arguments).forEach(key => {
-    if (!(key in arguments) && 'default' in expected_arguments[key]) {
-      arguments[key] = expected_arguments[key].default
-    }
-  })
-
-  return arguments
-}
-
-function parseCommandLineInputsUsingYargs() {
+function parseArgs() {
   const DEFAULTS = {
     input: 'cluster-compose.yml',
     noSwarm: false,
@@ -335,7 +286,7 @@ function parseCommandLineInputsUsingYargs() {
 }
 
 function main() {
-  const options = parseCommandLineInputsUsingYargs()
+  const options = parseArgs()
 
   const clusterComposePath = options.input || DEFAULT_IN;
   const destComposePath = options.output || 1; /** TRICK: 1 = stdout */
