@@ -258,7 +258,7 @@ function parseArgs() {
   const options = yargs
     .option('i', {
       alias: 'input',
-      describe: `Path to the input cluster-compose.yml file. Defaults to "${DEFAULTS.input}".`,
+      describe: `Path to the input cluster-compose.yml file.`,
       default: DEFAULTS.input,
       type: 'string'
     })
@@ -269,7 +269,7 @@ function parseArgs() {
     })
     .option('ns', {
       alias: 'no-swarm',
-      describe: 'Use true to disable swarm. Defaults to false',
+      describe: 'Disabling swarm.',
       default: false,
       type: 'boolean'
     })
@@ -285,13 +285,23 @@ function parseArgs() {
   return options
 }
 
+function validatePath(path) {
+  if (!fs.existsSync(path)) {
+    console.log(`${path} file not found. Please, provide necessary data to continue.`);
+    process.exit();
+  }
+}
+
 function main() {
   const options = parseArgs()
 
   const clusterComposePath = options.input || DEFAULT_IN;
   const destComposePath = options.output || 1; /** TRICK: 1 = stdout */
-  noSwarmP = options.noSwarm;
-  prepareHostP = options.hostPrepare
+  const noSwarmP = options.noSwarm;
+  const prepareHostP = options.hostPrepare
+
+  validatePath(clusterComposePath);
+
   const clusterJSON = expandClusterCompose(clusterComposePath);
 
   if (noSwarmP) {
