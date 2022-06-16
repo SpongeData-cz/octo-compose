@@ -6,6 +6,7 @@ const yml = require("js-yaml");
 const _ = require("underscore");
 const {spawnSync, execSync} = require('child_process');
 const yargs = require('yargs');
+const readline = require("readline");
 
 const DEFAULT_IN = 'cluster-compose.yml';
 
@@ -19,11 +20,10 @@ function gitFetch(url, extraArgs) {
 
   let ret = undefined;
 
-  if (fs.statSync(project, { throwIfNoEntry: false }) === undefined) {
-    ret = spawnSync("git", ["clone", `${url}${extraArgs}`, '--recurse-submodules'], { env: process.env });
-  }
-  else {
-    ret = spawnSync('git', ['pull'], { env: process.env, cwd: project });
+  if (fs.statSync(project, {throwIfNoEntry: false}) === undefined) {
+    ret = spawnSync("git", ["clone", `${url}${extraArgs}`, '--recurse-submodules'], {env: process.env});
+  } else {
+    ret = spawnSync('git', ['pull'], {env: process.env, cwd: project});
   }
 
   if (ret.status !== 0) {
@@ -39,7 +39,7 @@ function gitFetch(url, extraArgs) {
 }
 
 function gitCheckout(project, rev) {
-  const ret = spawnSync("git", ["checkout", rev], { cwd: project });
+  const ret = spawnSync("git", ["checkout", rev], {cwd: project});
 
   if (ret.status !== 0) {
     if (ret.stderr)
@@ -56,14 +56,12 @@ function gitCheckout(project, rev) {
 function merge(a, b) {
   if (_.isArray(a) && _.isArray(b)) {
     return _.union(a, b);
-  }
-  else if (_.isObject(b) && _.isObject(a)) {
+  } else if (_.isObject(b) && _.isObject(a)) {
     let out = _.extend({}, a);
     for (let k in b) {
       if (a[k]) {
         out[k] = merge(a[k], b[k]);
-      }
-      else {
+      } else {
         out[k] = b[k];
       }
     }
@@ -77,11 +75,9 @@ function expandServiceTemplate(serviceCompose, translation) {
   function mapping(value) {
     if (_.isArray(value)) {
       return _.map(value, mapping);
-    }
-    else if (_.isObject(value)) {
+    } else if (_.isObject(value)) {
       return _.mapObject(value, mapping);
-    }
-    else if (_.isString(value)) {
+    } else if (_.isString(value)) {
       let out = value;
 
       for (const tr in translation) {
@@ -122,17 +118,17 @@ function expandOctoCompose(octoDeploy, octoCompose, parentalDockerCompose, paren
     octoFileContent = fs.readFileSync(octoFileName, 'utf8');
   }
 
-  let octoFileParsed = (octoFileContent ? yml.load(octoFileContent) : { [parentalDockerServiceName]: {} });
+  let octoFileParsed = (octoFileContent ? yml.load(octoFileContent) : {[parentalDockerServiceName]: {}});
   octoCompose = octoCompose || {};
   // console.error("OCTOFIENAME:::", octoFileParsed);
 
   /**
-  *  octo-deploy:
-      replicas: 1
-      placement:
-        - manager
-      port-range: 7777
-  */
+   *  octo-deploy:
+   replicas: 1
+   placement:
+   - manager
+   port-range: 7777
+   */
   let replicas = octoDeploy.replicas || 1;
   let placement = octoDeploy.placement;
   if (!placement || placement.length == 0) {
@@ -148,9 +144,8 @@ function expandOctoCompose(octoDeploy, octoCompose, parentalDockerCompose, paren
       const high = portRange.high;
       if (!high) throw new Error("High range must be specified");
       if (low > high) throw new Error("Low must be lower than High");
-    }
-    else if (_.isNumber(portRange)) {
-      portRange = { low: portRange, high: portRange };
+    } else if (_.isNumber(portRange)) {
+      portRange = {low: portRange, high: portRange};
     }
   }
 
@@ -241,8 +236,8 @@ function runScript(code, envExtenstion) {
   envExtenstion = envExtenstion || {};
 
   try {
-    execSync(code, { env: _.extend(process.env, envExtenstion), stdio: 'inherit' });
-  } catch(e) {
+    execSync(code, {env: _.extend(process.env, envExtenstion), stdio: 'inherit'});
+  } catch (e) {
     console.error(`Command execution error: ${e.message}`);
     throw new Error(`Script thrown: ${e.message}`);
   }
@@ -285,10 +280,11 @@ function parseArgs() {
   return options
 }
 
-function validatePath(path) {
-  path = `./${path}`;
-  if (!fs.existsSync(path)) {
-    console.log(`${path} file not found. Please, provide necessary data to continue.`);
+function validatePath(providedPath) {
+  const absolutePath = path.resolve(providedPath);
+
+  if (!fs.existsSync(absolutePath)) {
+    console.log(`${providedPath} file not found. Please, provide necessary data to continue.`);
     process.exit();
   }
 }
@@ -296,18 +292,19 @@ function validatePath(path) {
 function validateClusterCompose(clusterComposePath) {
   validatePath(clusterComposePath);
 
-  fs.readFile(clusterComposePath, 'utf-8', (err, data) => {
-    if (err) return console.log("Couldn't read the file");
+  const fileData = fs.readFileSync(clusterComposePath, 'utf-8');
 
-    for (let path of data.matchAll(/[a-z._\-\d]+\.+[a-z]{2,3}/g)) validatePath(path);
-  });
+  const pattern = /[a-z._\-\d]+\.+[a-z]{2,3}/g
+
+  for (let path of fileData.matchAll(pattern)) validatePath(path[0]);
 }
 
 function main() {
   const options = parseArgs()
 
   const clusterComposePath = options.input || DEFAULT_IN;
-  const destComposePath = options.output || 1; /** TRICK: 1 = stdout */
+  const destComposePath = options.output || 1;
+  /** TRICK: 1 = stdout */
   const noSwarmP = options.noSwarm;
   const prepareHostP = options.hostPrepare
 
@@ -317,14 +314,16 @@ function main() {
 
   if (noSwarmP) {
     /** remove .deploy key from services */
-    _.each(clusterJSON.services, function (service) { delete service.deploy; });
+    _.each(clusterJSON.services, function (service) {
+      delete service.deploy;
+    });
   }
 
   if (prepareHostP) {
     console.log(JSON.stringify(clusterJSON));
-    _.each(clusterJSON.services, function(service) {
+    _.each(clusterJSON.services, function (service) {
       let serviceEnv = {};
-      _.each(service.environment || [], function(env){
+      _.each(service.environment || [], function (env) {
         const envSplit = env.split("=");
         serviceEnv[envSplit[0]] = envSplit[1];
       });
@@ -333,7 +332,7 @@ function main() {
       _.each(cmds, _.partial(runScript, _, serviceEnv));
     });
   } else {
-    const clusterYML = yml.dump(clusterJSON, { noRefs: true });
+    const clusterYML = yml.dump(clusterJSON, {noRefs: true});
     fs.writeFileSync(destComposePath, clusterYML);
   }
 }
