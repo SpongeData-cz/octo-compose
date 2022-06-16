@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const yml = require("js-yaml");
 const _ = require("underscore");
-const { spawnSync, execSync } = require('child_process');
+const {spawnSync, execSync} = require('child_process');
 const yargs = require('yargs');
 
 const DEFAULT_IN = 'cluster-compose.yml';
@@ -286,10 +286,21 @@ function parseArgs() {
 }
 
 function validatePath(path) {
+  path = `./${path}`;
   if (!fs.existsSync(path)) {
     console.log(`${path} file not found. Please, provide necessary data to continue.`);
     process.exit();
   }
+}
+
+function validateClusterCompose(clusterComposePath) {
+  validatePath(clusterComposePath);
+
+  fs.readFile(clusterComposePath, 'utf-8', (err, data) => {
+    if (err) return console.log("Couldn't read the file");
+
+    for (let path of data.matchAll(/[a-z._\-\d]+\.+[a-z]{2,3}/g)) validatePath(path);
+  });
 }
 
 function main() {
@@ -300,7 +311,7 @@ function main() {
   const noSwarmP = options.noSwarm;
   const prepareHostP = options.hostPrepare
 
-  validatePath(clusterComposePath);
+  validateClusterCompose(clusterComposePath);
 
   const clusterJSON = expandClusterCompose(clusterComposePath);
 
