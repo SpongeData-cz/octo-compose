@@ -1,0 +1,4 @@
+php:
+  image: php:7-fpm
+  volumes:
+    - ./html:/var/www/html

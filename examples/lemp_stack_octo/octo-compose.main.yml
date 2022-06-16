@@ -1,0 +1,53 @@
+version: 3.8
+
+networks:
+  lemp_stack:
+    external: true
+
+services:
+  nginx:
+    octo-compose:
+      context: .
+      octo-compose: octo-compose.nginx.yml
+
+    octo-deploy:
+      replicas: 1
+      placement:
+        - manager
+      port-range: 8080
+
+    networks:
+      - lemp_stack
+
+  php:
+    octo-compose:
+      context: .
+      octo-compose: octo-compose.php.yml
+
+    octo-deploy:
+      replicas: 1
+      placement:
+        - manager
+      port-range: 8080
+
+    networks:
+      - lemp_stack
+
+  mariadb:
+    octo-compose:
+      context: .
+      octo-compose: octo-compose.mariadb.yml
+
+    octo-deploy:
+      replicas: 1
+      placement:
+        - manager
+      port-range: 8080
+
+    networks:
+      - lemp_stack
+
+
+configs:
+  my_settings:
+    file: cloud_settings.js
