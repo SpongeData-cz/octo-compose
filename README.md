@@ -1,5 +1,5 @@
 # octo-compose
-> Tool designed to join docker-compose files into one, templating support included.
+> Tool designed to join docker-compose files into one, templating support included. Octo-compose may be used as an alternative to Helm in clean Docker or Docker Swarm environments.
 
 # Table of Contents
 * [Installation](#installation)
