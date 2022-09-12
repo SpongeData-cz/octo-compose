@@ -84,6 +84,9 @@ function expandServiceTemplate(serviceCompose, translation) {
       let out = value;
 
       for (const tr in translation) {
+        if(!(tr in translation ))
+          throw new Error(`Undefined templating variable ${tr}.`);
+
         out = out.replaceAll(`$\{${tr}\}`, translation[tr]);
       }
 
@@ -231,6 +234,10 @@ function expandClusterCompose(clusterComposePath) {
     const parentalDockerCompose = (prepareHostP ? _.clone(cService) : _.omit(cService, "octo-compose", "octo-deploy", "octo-host-prepare"));
 
     _.extendOwn(out.services, expandOctoCompose(octoDeploy, octoCompose, parentalDockerCompose, s));
+  }
+
+  for (const key in _.omit(clusterFileParsed, "services")) {
+    _.extendOwn(out[key], expandServiceTemplate(clusterFileParsed[key], process.env));
   }
 
   return out;
