@@ -135,10 +135,15 @@ function expandOctoCompose(octoDeploy, octoCompose, parentalDockerCompose, paren
         - manager
       port-range: 7777
   */
-  let replicas = octoDeploy.replicas || 1;
-  let placement = octoDeploy.placement;
+
+  let replicas = (octoDeploy ? (octoDeploy.replicas || 1) : 1);
+  let placement = (octoDeploy ? octoDeploy.placement : ["auto-manager"]);
   if (!placement || placement.length == 0) {
     throw new Error("Key placement must be present and must have at least one index.");
+  }
+
+  if( !octoDeploy ) {
+    octoDeploy = {};
   }
 
   let portRange = octoDeploy["port-range"];
@@ -255,15 +260,23 @@ function runScript(code, envExtenstion) {
 }
 
 function main(conf) {
-  const clusterComposePath = conf["-i"] || conf["--input"] || DEFAULT_IN;
-  const destComposePath = conf["-o"] || conf["--output"] || 1; /** TRICK: 1 = stdout */
-  noSwarmP = conf["-n"] || conf["--noSwarm"] || false;
-  prepareHostP = conf["-p"] || conf["--hostPrepare"]
-  const clusterJSON = expandClusterCompose(clusterComposePath);
+  const clusterComposePaths = (conf["-i"] || conf["--input"] || [DEFAULT_IN]);
+  const destComposePath = (conf["-o"] || conf["--output"] || [1])[0]; /** TRICK: 1 = stdout */
+  noSwarmP = (conf["-n"] || conf["--noSwarm"] || [false])[0];
+  prepareHostP = (conf["-p"] || conf["--hostPrepare"] || [false])[0]
 
-  if (noSwarmP) {
-    /** remove .deploy key from services */
-    _.each(clusterJSON.services, function (service) { delete service.deploy; });
+  let clusterJSON = {};
+
+  for( c in clusterComposePaths ) {
+    const clusterComposePath = clusterComposePaths[c];
+    const outJSON = expandClusterCompose(clusterComposePath);
+
+    if (noSwarmP) {
+      /** remove .configs and .deploy key from services */
+      _.each(outJSON.services, function (service) { delete service.deploy; delete service.configs; });
+    }
+
+    clusterJSON = merge(clusterJSON, outJSON);
   }
 
   if (prepareHostP) {
@@ -288,11 +301,11 @@ let conf = {};
 let args = process.argv.slice(2);
 for (let a = 0; a < args.length; a++) {
   if ((a % 2) == 0) {
-    conf[args[a]] = args[a + 1];
+    if (!(args[a] in conf))
+      conf[args[a]] = []
+    conf[args[a]].push(args[a + 1]);
   }
 }
-
-// console.error("ARGS::::", conf);
 
 if (conf.hasOwnProperty("--help") || conf.hasOwnProperty("-h")) {
   console.log(
