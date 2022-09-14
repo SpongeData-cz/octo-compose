@@ -310,11 +310,13 @@ for (let a = 0; a < args.length; a++) {
 if (conf.hasOwnProperty("--help") || conf.hasOwnProperty("-h")) {
   console.log(
     "Usage: octo-compose [-p|--hostPrepare] [-i|--input] [-o|--output] [--noSwarm|-n] [--help|-h]\n\n"
-    + `  --input    Path to the input cluster-compose.yml file. Defaults to "${DEFAULT_IN}".\n`
-    + "  --output   Path to the output docker-compose.yml file. Defaults to stdout.\n"
-    + "  --noSwarm  Use true to disable swarm. Defaults to false.\n"
-    + "  --hostPrepare Use true value to start host initialization scripts defined under 'octo-host-prepare' key in cluster-compose.yml. May be set to true only. Stdout is used as inherited scripts stdout then. When used -o argument, stdout of scripts will be its content."
-    + "  --help     Print this message and exit.\n");
+    + `  --input|-i\t\tPath to the input cluster-compose.yml file. Defaults to "${DEFAULT_IN}". Parameter may be used more than once, mixing -i and --input is not allowed.\n`
+    + "  --output|-o\t\tPath to the output docker-compose.yml file. Defaults to stdout.\n"
+    + "  --noSwarm|-n\t\tUse true to disable swarm. Defaults to false.\n"
+    + "  --hostPrepare|-p\tUse true value to start host initialization scripts defined under 'octo-host-prepare' key in cluster-compose.yml. May be set to true only. Stdout is used as inherited scripts stdout then. When used -o argument, stdout of scripts will be its content.\n"
+    + "  --help|-h\t\tPrint this message and exit.\n"
+    + "For cluster-compose.yml and octo-compose.yml file format please visit (https://github.com/SpongeData-cz/octo-compose)."
+    );
   process.exit();
 }
 

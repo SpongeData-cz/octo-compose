@@ -121,7 +121,7 @@ Run `octo-compose -h` to display the help message for more info.
 You get these information:
 * `--input|-i` - path to the input cluster-compose.yml file. Defaults to "cluster-compose.yml", it may be used more than once, do not mix `-i` and `--input`.
 * `--output|-o` -  Path to the output docker-compose.yml file. Defaults to stdout.
-* `--noSwarm|-ns` - Use *true* to disable swarm. Defaults to *false*.
+* `--noSwarm|-n` - Use *true* to disable swarm. Defaults to *false*.
 * `--hostPrepare|-p` - Use *true* value to start host initialization scripts defined under 'octo-host-prepare' key in cluster-com
 d -o argument, stdout of scripts will be its content.
 * `--help|-h` Print this message and exit.
