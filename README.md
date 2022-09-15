@@ -1,6 +1,7 @@
-<p align="center"><img src="https://raw.githubusercontent.com/SpongeData-cz/octo-compose/52efb3506ced9f0f6d1491296e6bd7b3e3432482/logo.svg" width="400" /></p>
-
 # octo-compose
+
+<p align="center"><img src="https://raw.githubusercontent.com/SpongeData-cz/octo-compose/52efb3506ced9f0f6d1491296e6bd7b3e3432482/logo.svg" width="200" /></p>
+
 > Is a tool designed to join docker-compose files into one, templating support is included. Octo-compose may be used as an alternative to Helm in clean Docker or Docker Swarm environments, input to the `octo-compose` is a set of cluster-compose and octo-compose files and its output is final `docker-compose.yml` for both swarm and non-swarm modes. Octo-compose allows you to significantly reduce redundancy when creating similar Compose files for different configurations and environments such as development, testing, swarm, non-swarm modes. You can use `.env` files to configure your docker-compose deployment easily. You may initiate your hosts via octo compose in one step without manual work. Octo-compose allows you to link services via git, folder and docker registry. Merge process allows you to patch compose files multiple times to enrich final form of the docker-compose file.
 
 # Table of Contents
