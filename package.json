@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://git@10.0.0.105:10022/octopus/octo-compose.git"
+    "url": "https://github.com/SpongeData-cz/octo-compose.git"
   },
   "keywords": [
     "docker",
