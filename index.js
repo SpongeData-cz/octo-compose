@@ -87,7 +87,8 @@ function expandServiceTemplate(serviceCompose, translation) {
         if(!(tr in translation ))
           throw new Error(`Undefined templating variable ${tr}.`);
 
-        out = out.replaceAll(`$\{${tr}\}`, translation[tr]);
+        const regex = new RegExp(`\\$\\{${tr}\\}`, "g");
+        out = out.replace(regex, translation[tr]);
       }
 
       return out;
